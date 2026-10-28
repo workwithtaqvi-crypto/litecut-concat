@@ -51,7 +51,7 @@ permissions:
   actions: read
 
 env:
-  CARGO_TERM_COLOR: always
+  CARGO_TERM_COLOR: never
   # The prebuilt dependencies - BtbN's FFmpeg 8.1 (GPL, shared, one per
   # arch), ONNX Runtime, sherpa-onnx, nfpm, appimagetool, LLVM for Windows
   # and Intel's emulator - are each pinned to one file and its digest in
@@ -488,7 +488,7 @@ jobs:
         if: failure()
         shell: bash
         run: |
-          grep -n -B2 -A25 "^error" build.log 2>/dev/null | head -c 40000 > errors.txt || true
+          sed "s/\x1b\[[0-9;]*m//g" build.log | grep -a -n -B3 -A25 -E "^(error|warning: unused.*error)|error(\[E[0-9]+\])?:|panicked|failed to run custom build|process didn.t exit" | head -c 40000 > errors.txt || true
           tail -n 60 build.log > tail.txt 2>/dev/null || true
           for f in errors.txt tail.txt; do
             [ -s "$f" ] || continue

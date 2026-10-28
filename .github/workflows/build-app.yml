@@ -997,10 +997,15 @@ jobs:
           Shot "shots\01_start.png"
           Stop-Process $p -Force -ErrorAction SilentlyContinue
           Start-Sleep 3
-          New-Item -ItemType Directory -Force C:\shotproj | Out-Null
-          $p = Start-Process $exe -ArgumentList "--project","C:\shotproj" -PassThru
-          Start-Sleep 30
-          Shot "shots\02_editor.png"
+          Add-Type -TypeDefinition 'using System; using System.Runtime.InteropServices; public class M { [DllImport("user32.dll")] public static extern bool SetCursorPos(int x, int y); [DllImport("user32.dll")] public static extern void mouse_event(uint f, uint dx, uint dy, uint d, int e); public static void Click(int x, int y) { SetCursorPos(x, y); mouse_event(2,0,0,0,0); mouse_event(4,0,0,0,0); } }'
+          $p = Start-Process $exe -PassThru
+          Start-Sleep 25
+          [M]::Click(310, 236)
+          Start-Sleep 4
+          Shot "shots\02_newdialog.png"
+          [System.Windows.Forms.SendKeys]::SendWait("{ENTER}")
+          Start-Sleep 15
+          Shot "shots\03_editor.png"
           Stop-Process $p -Force -ErrorAction SilentlyContinue
           git config --global user.email ci@example.com
           git config --global user.name ci

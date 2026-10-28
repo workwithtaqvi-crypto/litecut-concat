@@ -5,6 +5,12 @@
 //! the build for Settings > About.
 
 fn main() {
+    // Fork CI builds without LTO, so whisper-rs's unused ggml_cpu_has_* probes
+    // stay in the link; with backend-DL they live in the CPU variant DLLs.
+    // Never called, so let the linker leave them unresolved.
+    if std::env::var("CARGO_CFG_TARGET_ENV").as_deref() == Ok("msvc") {
+        println!("cargo:rustc-link-arg-bins=/FORCE:UNRESOLVED");
+    }
     // Fonts and images are compiled into the binary rather than read off disk
     // at run time.
     //

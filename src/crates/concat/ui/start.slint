@@ -1594,12 +1594,8 @@ component LearnGrid inherits Rectangle {
 
 // ── the screen ───────────────────────────────────────────────────────────
 
-// The wide page: a desk's window, from 680px across to a 4K screen.
-//
-// One column, centred, no wider than reads well: a greeting, the create
-// row, the projects, and - once the column is wide enough to spare it - a
-// learn-and-community panel beside the projects rather than under them,
-// so it is in view without a scroll and the projects keep the width.
+// CapCut-style home: a sidebar on the left, and on the right a big
+// "Create project" banner over the projects list.
 component WideHome inherits Rectangle {
     in property <[RecentProjectData]> recents;
     in property <int> recents-total;
@@ -1618,141 +1614,177 @@ component WideHome inherits Rectangle {
     callback sort-changed(sort: int);
     callback link(name: string);
 
-    /// The margin the page keeps from the window's edges.
-    property <length> pad: Math.max(24px, Math.min(64px, root.width / 18));
-    property <length> pad-top: Math.max(28px, Math.min(72px, root.height / 12));
-    property <length> content-w: Math.min(root.width - 2 * root.pad, 1360px);
-    /// Room for the learn panel beside the projects.
-    property <bool> aside: root.content-w >= 1100px;
-    property <length> aside-w: root.content-w >= 1280px ? 360px : 330px;
-    property <length> aside-gap: 40px;
-    property <length> main-w: root.aside ? root.content-w - root.aside-w - root.aside-gap
-        : root.content-w;
-    /// The drop tile, beside New and Open, where they still have room.
-    property <bool> drop-tile: root.can-drop && root.main-w >= 940px;
-    /// The create row shares its width by weight - New a third again as
-    /// wide as the others - and not by what its words would like, so a
-    /// longer line on one tile does not shoulder the others aside.
-    property <length> tile-unit: (root.main-w - (root.drop-tile ? 2 : 1) * 14px)
-        / (root.drop-tile ? 3.3 : 2.3);
-    property <bool> searchable: root.recents-total > 8;
+    background: Theme.launch-page;
 
-    flick := Flickable {
-        content-width: self.width;
-        content-height: Math.max(self.height, page.height + root.pad-top + root.pad);
-        interactive: page.height + root.pad-top + root.pad > self.height;
+    HorizontalLayout {
+        side := Rectangle {
+            width: 230px;
+            background: Theme.launch-panel;
 
-        page := Rectangle {
-            x: (flick.width - self.width) / 2;
-            y: root.pad-top;
-            width: root.content-w;
-            height: Math.max(main.preferred-height,
-                root.aside ? side.y + side-body.preferred-height : 0px);
-
-            main := VerticalLayout {
-                x: 0;
-                y: 0;
-                width: root.main-w;
-                height: self.preferred-height;
+            VerticalLayout {
+                padding: 18px;
+                spacing: 10px;
                 alignment: start;
 
-                // ── the greeting ─────────────────────────────────────
                 Text {
-                    text: root.recents-total == 0
-                        ? I18n.t("start.welcome")
-                        : I18n.t("start.welcomeBack");
+                    text: "LiteCut";
                     color: Theme.fg;
-                    // The one display-sized line in the app. The tree
-                    // bundles no display face, so the interface face
-                    // carries it at its heaviest weight and tight tracking.
-                    font-size: Theme.fs-display;
-                    font-weight: Theme.weight-display;
-                    letter-spacing: -1px;
-                    wrap: word-wrap;
+                    font-size: 24px;
+                    font-weight: 800;
                 }
+                Rectangle { height: 14px; }
 
-                Rectangle { height: 8px; }
-
-                Text {
-                    text: root.recents-total == 0
-                        ? I18n.t("start.welcomeNote")
-                        : I18n.t("start.welcomeBackNote");
-                    color: Theme.fg-muted;
-                    font-size: Theme.fs-xl;
-                    wrap: word-wrap;
-                }
-
-                Rectangle { height: 28px; }
-
-                // ── create ───────────────────────────────────────────
-                create-row := HorizontalLayout {
-                    height: 92px;
-                    spacing: 14px;
-
-                    CreateTile {
-                        width: root.tile-unit * 1.3;
-                        primary: true;
-                        glyph: Glyph.plus;
-                        title: I18n.t("start.newProject");
-                        note: I18n.t("start.newProjectNote");
-                        enabled: !root.busy;
-                        clicked => { root.compose(); }
-                    }
-
-                    CreateTile {
-                        width: root.tile-unit;
-                        glyph: Glyph.folder;
-                        title: I18n.t("start.openProject");
-                        note: I18n.t("start.openProjectNote");
-                        enabled: !root.busy;
-                        clicked => { root.open(); }
-                    }
-
-                    if root.drop-tile: DropTile {
-                        width: root.tile-unit;
-                    }
-                }
-
-                // Where the tile does not fit, a line says what it would.
-                if root.can-drop && !root.drop-tile: VerticalLayout {
-                    padding-top: 12px;
-                    Text {
-                        text: I18n.t("start.dropHint");
-                        color: Theme.fg-dim;
-                        font-size: Theme.fs;
-                        wrap: word-wrap;
-                    }
-                }
-
-                Rectangle { height: 44px; }
-
-                // ── the projects ─────────────────────────────────────
-                SectionHead {
-                    height: 34px;
-                    text: I18n.t("start.recentProjects");
-                    count: root.recents-total > 0 ? "\{root.recents-total}" : "";
-
-                    // Past a page of them: by the time there are more
-                    // than a screen holds, the eye is not a search.
-                    if root.searchable: SearchField {
-                        width: Math.min(260px, root.main-w * 0.32);
-                        text: root.query;
-                        placeholder: I18n.t("start.searchProjects");
-                        edited(text) => { root.search-edited(text); }
-                    }
-
-                    if root.searchable: VerticalLayout {
-                        alignment: center;
-                        SegmentedControl {
-                            width: 156px;
-                            options: [I18n.t("start.sortRecent"), I18n.t("start.sortName")];
-                            current: root.sort;
-                            changed(index) => { root.sort-changed(index); }
+                Rectangle {
+                    height: 44px;
+                    border-radius: 10px;
+                    background: Theme.launch-raised;
+                    HorizontalLayout {
+                        padding-left: 14px;
+                        spacing: 12px;
+                        alignment: start;
+                        VerticalLayout {
+                            alignment: center;
+                            Icon { glyph: Glyph.film; size: 18px; weight: 2.0; tint: Theme.accent; }
+                        }
+                        VerticalLayout {
+                            alignment: center;
+                            Text { text: "Home"; color: Theme.fg; font-size: 15px; font-weight: Theme.weight-title; }
                         }
                     }
                 }
 
-                Rectangle { height: 16px; }
+                Pressable {
+                    height: 44px;
+                    radius: 10px;
+                    label: "Open project";
+                    background: self.lit ? Theme.launch-raised : Colors.transparent;
+                    enabled: !root.busy;
+                    clicked => { root.open(); }
+                    HorizontalLayout {
+                        padding-left: 14px;
+                        spacing: 12px;
+                        alignment: start;
+                        VerticalLayout {
+                            alignment: center;
+                            Icon { glyph: Glyph.folder; size: 18px; weight: 2.0; tint: Theme.fg-muted; }
+                        }
+                        VerticalLayout {
+                            alignment: center;
+                            Text { text: "Open project"; color: Theme.fg; font-size: 15px; font-weight: Theme.weight-title; }
+                        }
+                    }
+                }
+
+                Rectangle { vertical-stretch: 1; }
+
+                VersionLine {
+                    version: root.version;
+                    notes => { root.link("release-notes"); }
+                }
+            }
+        }
+
+        flick := Flickable {
+            horizontal-stretch: 1;
+            content-height: Math.max(self.height, body.preferred-height + 48px);
+            interactive: body.preferred-height + 48px > self.height;
+
+            body := VerticalLayout {
+                x: 24px;
+                y: 24px;
+                width: flick.width - 48px;
+                spacing: 18px;
+                alignment: start;
+
+                banner := Pressable {
+                    height: 150px;
+                    radius: 16px;
+                    label: "Create project";
+                    enabled: !root.busy;
+                    background: @linear-gradient(100deg, #12040a 0%, #4a0a16 35%, #b30f22 75%, #ff2a33 100%);
+                    opacity: self.lit ? 0.92 : 1.0;
+                    clicked => { root.compose(); }
+
+                    HorizontalLayout {
+                        alignment: center;
+                        spacing: 16px;
+                        VerticalLayout {
+                            alignment: center;
+                            Rectangle {
+                                width: 48px;
+                                height: 48px;
+                                border-radius: 12px;
+                                background: #ffffff;
+                                Icon {
+                                    x: (parent.width - self.width) / 2;
+                                    y: (parent.height - self.height) / 2;
+                                    glyph: Glyph.plus;
+                                    size: 26px;
+                                    weight: 3.0;
+                                    tint: #c8102e;
+                                }
+                            }
+                        }
+                        VerticalLayout {
+                            alignment: center;
+                            Text { text: "Create project"; color: #ffffff; font-size: 28px; font-weight: 700; }
+                        }
+                    }
+                }
+
+                HorizontalLayout {
+                    alignment: start;
+                    Pressable {
+                        width: 340px;
+                        height: 68px;
+                        radius: 12px;
+                        label: "Open project";
+                        background: self.lit ? Theme.launch-raised : Theme.launch-panel;
+                        border-width: 1px;
+                        border-color: Theme.line;
+                        enabled: !root.busy;
+                        clicked => { root.open(); }
+                        HorizontalLayout {
+                            padding-left: 18px;
+                            spacing: 14px;
+                            alignment: start;
+                            VerticalLayout {
+                                alignment: center;
+                                Rectangle {
+                                    width: 34px;
+                                    height: 34px;
+                                    border-radius: 17px;
+                                    background: Theme.accent;
+                                    Icon {
+                                        x: (parent.width - self.width) / 2;
+                                        y: (parent.height - self.height) / 2;
+                                        glyph: Glyph.folder;
+                                        size: 17px;
+                                        weight: 2.0;
+                                        tint: Theme.on-accent;
+                                    }
+                                }
+                            }
+                            VerticalLayout {
+                                alignment: center;
+                                Text { text: "Open project"; color: Theme.fg; font-size: 17px; font-weight: 600; }
+                            }
+                        }
+                    }
+                }
+
+                SectionHead {
+                    height: 34px;
+                    text: "Projects";
+                    count: "(\{root.recents-total})";
+
+                    if root.recents-total > 8: SearchField {
+                        width: 240px;
+                        text: root.query;
+                        placeholder: I18n.t("start.searchProjects");
+                        edited(text) => { root.search-edited(text); }
+                    }
+                }
 
                 if root.recents-total == 0: EmptyProjects {
                     first-edit => { root.link("first-edit"); }
@@ -1773,94 +1805,8 @@ component WideHome inherits Rectangle {
                     forgotten(path) => { root.forget-recent(path); }
                     revealed(path) => { root.reveal-recent(path); }
                 }
-
-                // ── learn, under the projects ────────────────────────
-                if !root.aside: VerticalLayout {
-                    padding-top: 48px;
-                    spacing: 16px;
-
-                    SectionHead {
-                        height: 34px;
-                        text: I18n.t("start.learnAndCommunity");
-                    }
-
-                    LearnGrid {
-                        items: Learn.desk;
-                        link(name) => { root.link(name); }
-                    }
-
-                    VersionLine {
-                        padding-top: 8px;
-                        version: root.version;
-                        notes => { root.link("release-notes"); }
-                    }
-                }
-            }
-
-            // ── learn, beside the projects ───────────────────────────
-            // From the create row down, so its top lines up with the
-            // first thing that can be pressed.
-            side := Rectangle {
-                x: root.main-w + root.aside-gap;
-                y: create-row.y;
-                width: root.aside-w;
-                height: side-body.preferred-height;
-                visible: root.aside;
-                border-radius: Theme.r-lg;
-                background: Theme.launch-panel;
-                border-width: 1px;
-                border-color: Theme.line;
-
-                side-body := VerticalLayout {
-                    padding: 8px;
-                    padding-top: 16px;
-                    spacing: 2px;
-
-                    HorizontalLayout {
-                        padding-left: 10px;
-                        Text {
-                            text: I18n.t("start.learnAndCommunity");
-                            color: Theme.fg;
-                            font-size: Theme.fs-xl;
-                            font-weight: Theme.weight-title;
-                        }
-                    }
-
-                    Rectangle { height: 8px; }
-
-                    for item in Learn.desk: LearnCard {
-                        height: 58px;
-                        flat: true;
-                        item: item;
-                        enabled: root.aside;
-                        clicked => { root.link(item.name); }
-                    }
-
-                    Rectangle {
-                        height: 1px;
-                        background: Theme.line;
-                    }
-
-                    VersionLine {
-                        padding-left: 10px;
-                        padding-top: 8px;
-                        padding-bottom: 4px;
-                        version: root.version;
-                        notes => { root.link("release-notes"); }
-                    }
-                }
             }
         }
-    }
-
-    if flick.interactive: ThinScrollbar {
-        x: parent.width - self.width - 2px;
-        y: 0;
-        height: parent.height;
-        viewport: parent.height;
-        content: flick.content-height;
-        offset: -flick.content-y;
-        scrolled(to) => { flick.content-y = -to; }
     }
 }
 

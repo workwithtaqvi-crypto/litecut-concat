@@ -569,7 +569,7 @@ component ExportFooter inherits VerticalLayout {
 // Lays its children out at most `max` wide, centred in whatever width it
 // is given: a sheet the width of a 4K monitor is not read across.
 component Measure inherits HorizontalLayout {
-    in property <length> max: 1180px;
+    in property <length> max: 1000px;
 
     Rectangle { horizontal-stretch: 1; }
     VerticalLayout {
@@ -616,7 +616,7 @@ export component ExportDialog inherits Rectangle {
     /// How many columns the width holds. Three groups a column wide need
     /// about 330px each; under two of those the sheet is a phone's single
     /// column and scrolls.
-    property <int> columns: root.width >= 1080px ? 3 : root.width >= 720px ? 2 : 1;
+    property <int> columns: root.width >= 720px ? 2 : 1;
 
     /// How far down the sheet is, as a share of the window: 0 up, 1 gone.
     /// A share rather than a length, so a window resized while the sheet is
@@ -764,19 +764,19 @@ export component ExportDialog inherits Rectangle {
                                 seek(seconds) => { root.seek(seconds); }
                             }
                             SummarySection { data: root.data; }
-                            DestinationSection {
-                                data: root.data;
-                                phone: root.phone;
-                                name-edited(name) => { root.name-edited(name); }
-                                browse => { root.browse(); }
-                            }
                         }
 
                         VerticalLayout {
                             alignment: start;
                             horizontal-stretch: 1;
-                            OutputSection {
+                            DestinationSection {
                                 first: true;
+                                data: root.data;
+                                phone: root.phone;
+                                name-edited(name) => { root.name-edited(name); }
+                                browse => { root.browse(); }
+                            }
+                            OutputSection {
                                 data: root.data;
                                 bitrate-changed(mbps) => { root.bitrate-changed(mbps); }
                                 rate-changed(index) => { root.rate-changed(index); }

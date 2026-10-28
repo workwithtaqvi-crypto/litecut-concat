@@ -477,30 +477,24 @@ jobs:
       - name: Build
         # An Intel Mac runner is the slow one: its release build ran past
         # sixty minutes in v0.2.7-rc.1.
-        timeout-minutes: ${{ matrix.platform == 'macos' && matrix.arch == 'x86_64' && 100 || 60 }}
+        timeout-minutes: 150
         shell: bash
         working-directory: src
         run: |
           set -o pipefail
-          cargo build --profile app -p concat --target ${{ matrix.target }} 2>&1 | tee build.log
+          cargo build --profile quick -p concat --target ${{ matrix.target }} 2>&1 | tee build.log
 
-      - name: Push build log (failure only)
+      - name: Build errors as annotations (failure only)
         if: failure()
         shell: bash
-        env:
-          GH_TOKEN: ${{ github.token }}
         run: |
-          mkdir -p ../buildlog_out
-          grep -n -B2 -A25 "^error" build.log | head -400 > ../buildlog_out/errors.txt || true
-          tail -n 120 build.log > ../buildlog_out/tail.txt || true
-          cd ..
-          git config user.name ci
-          git config user.email ci@example.com
-          git checkout --orphan buildlog
-          git rm -rf . -q
-          git add -f buildlog_out
-          git commit -m buildlog -q
-          git push -f origin buildlog
+          grep -n -B2 -A25 "^error" build.log 2>/dev/null | head -c 40000 > errors.txt || true
+          tail -n 60 build.log > tail.txt 2>/dev/null || true
+          for f in errors.txt tail.txt; do
+            [ -s "$f" ] || continue
+            msg=$(sed 's/%/%25/g' "$f" | tr -d '\r' | sed ':a;N;$!ba;s/\n/%0A/g')
+            echo "::error title=$f::$msg"
+          done
       - name: Build log to the summary (failure only)
         if: failure()
         shell: bash
@@ -921,7 +915,7 @@ jobs:
           $name = "Concat-$env:VERSION-windows-${{ matrix.arch }}"
           $dir = "stage\$name"
           New-Item -ItemType Directory -Force $dir | Out-Null
-          Copy-Item "src\target\${{ matrix.target }}\app\concat.exe" $dir
+          Copy-Item "src\target\${{ matrix.target }}\quick\concat.exe" $dir
           Copy-Item "$env:FFMPEG_DIR\bin\*.dll" $dir
           # The sherpa-onnx runtime, set aside by the download step above.
           Copy-Item "$env:SHERPA_DLL_DIR\*.dll" $dir
@@ -932,7 +926,7 @@ jobs:
           # the program. Beside concat.exe Windows finds the DLLs and
           # concat-speech's `cpu_backend` the modules.
           if ("${{ matrix.ggml }}" -eq "variants") {
-            $built = Get-ChildItem "src\target\${{ matrix.target }}\app\build\whisper-rs-sys-*\out\bin\ggml-cpu-x64.dll" |
+            $built = Get-ChildItem "src\target\${{ matrix.target }}\quick\build\whisper-rs-sys-*\out\bin\ggml-cpu-x64.dll" |
               Sort-Object LastWriteTime -Descending | Select-Object -First 1
             if (-not $built) { throw "whisper-rs-sys installed no ggml-cpu-x64.dll" }
             Write-Host "whisper's build: $($built.DirectoryName)"

@@ -474,6 +474,21 @@ jobs:
       # Bash on every platform, teed to a log: raw job logs need a login to
       # read, but the step summary is public - so on failure the tail of the
       # build goes there, and a red run explains itself to anyone.
+      - name: More virtual memory (Windows)
+        if: matrix.platform == 'windows'
+        shell: pwsh
+        run: |
+          # private repo runners have ~7GB RAM; the Slint-generated module needs more
+          Get-CimInstance Win32_PageFileUsage | Format-List Name, AllocatedBaseSize
+          $drive = "D:"
+          $free = (Get-PSDrive D).Free / 1GB
+          Write-Host "D: free GB: $free"
+          $cs = Get-CimInstance Win32_ComputerSystem
+          if ($cs.AutomaticManagedPagefile) { $cs | Set-CimInstance -Property @{AutomaticManagedPagefile=$false} }
+          Get-CimInstance Win32_PageFileSetting | Remove-CimInstance -ErrorAction SilentlyContinue
+          New-CimInstance -ClassName Win32_PageFileSetting -Property @{Name="D:\\pagefile.sys"; InitialSize=[uint32]20000; MaximumSize=[uint32]20000} | Out-Null
+          Get-CimInstance Win32_PageFileSetting | Format-List Name, InitialSize, MaximumSize
+
       - name: Build
         # An Intel Mac runner is the slow one: its release build ran past
         # sixty minutes in v0.2.7-rc.1.

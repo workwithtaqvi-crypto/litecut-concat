@@ -13,7 +13,7 @@ pub const SEAT_MIN_H: f32 = 140.0;
 /// has been squeezed too far.
 pub const SEAT_MIN_GRAB: f32 = 64.0;
 /// The gutter between the halves of a split, and the margin round the lot.
-pub const SEAT_GAP: f32 = 8.0;
+pub const SEAT_GAP: f32 = 3.0;
 
 pub enum Dock {
     /// One view, filling its box.

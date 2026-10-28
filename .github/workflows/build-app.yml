@@ -1000,7 +1000,7 @@ jobs:
           Add-Type -TypeDefinition 'using System; using System.Runtime.InteropServices; public class M { [DllImport("user32.dll")] public static extern bool SetCursorPos(int x, int y); [DllImport("user32.dll")] public static extern void mouse_event(uint f, uint dx, uint dy, uint d, int e); public static void Click(int x, int y) { SetCursorPos(x, y); mouse_event(2,0,0,0,0); mouse_event(4,0,0,0,0); } }'
           $p = Start-Process $exe -PassThru
           Start-Sleep 25
-          [M]::Click(310, 236)
+          [M]::Click(620, 130)
           Start-Sleep 4
           Shot "shots\02_newdialog.png"
           [System.Windows.Forms.SendKeys]::SendWait("{ENTER}")

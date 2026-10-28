@@ -101,8 +101,8 @@ export global Theme {
     // Both are Hanken Grotesk, the one face this build bundles (app.slint).
     // The split between the roles stays so that the two can differ again
     // without touching a single element.
-    out property <string> font: "Hanken Grotesk";
-    out property <string> font-technical: "Hanken Grotesk";
+    out property <string> font: "Segoe UI";
+    out property <string> font-technical: "Segoe UI";
     /// The scale. `fs` is the body size everything inherits; the two either
     /// side of it are the dense readout and the panel title. `xl` is for the
     /// few lines that are content rather than chrome — a project's name in a
@@ -137,12 +137,12 @@ export global Theme {
     //
     // radii
     out property <length> r-xs: 3px;
-    out property <length> r-sm: 5px;
-    out property <length> r: 7px;
-    out property <length> r-lg: 12px;
+    out property <length> r-sm: 4px;
+    out property <length> r: 5px;
+    out property <length> r-lg: 6px;
     /// The dialog sheet, and nothing smaller. A modal is the largest rounded
     /// thing in the window and wants a corner to match.
-    out property <length> r-xl: 16px;
+    out property <length> r-xl: 8px;
 
     // metrics
     out property <length> h: 28px;        // standard control height

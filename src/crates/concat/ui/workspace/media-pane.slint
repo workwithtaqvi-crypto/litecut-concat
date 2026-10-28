@@ -1949,7 +1949,7 @@ export component MediaPane inherits Rectangle {
 
                         LibraryTab {
                             glyph: Glyph.film;
-                            label: I18n.t("common.media");
+                            label: "Import";
                             current: root.tab == 0;
                             clicked => { root.tab = 0; }
                         }
@@ -1974,16 +1974,16 @@ export component MediaPane inherits Rectangle {
                             clicked => { root.tab = 2; }
                         }
                         LibraryTab {
-                            glyph: Glyph.transition;
-                            label: I18n.t("mediaPane.transitions");
-                            current: root.tab == 3;
-                            clicked => { root.tab = 3; }
-                        }
-                        LibraryTab {
                             glyph: Glyph.sparkle;
                             label: I18n.t("common.effects");
                             current: root.tab == 4;
                             clicked => { root.tab = 4; }
+                        }
+                        LibraryTab {
+                            glyph: Glyph.transition;
+                            label: I18n.t("mediaPane.transitions");
+                            current: root.tab == 3;
+                            clicked => { root.tab = 3; }
                         }
                         LibraryTab {
                             glyph: Glyph.filter;

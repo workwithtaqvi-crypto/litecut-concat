@@ -81,7 +81,7 @@ export global Panes {
     public pure function glyph(kind: PaneKind) -> Glyph {
         return kind == PaneKind.media ? Glyph.film
             : kind == PaneKind.preview ? Glyph.image
-            : kind == PaneKind.inspector ? Glyph.settings
+            : kind == PaneKind.inspector ? Glyph.sliders
             : kind == PaneKind.keyframes ? Glyph.keyframe
             : Glyph.rows;
     }

@@ -305,6 +305,8 @@ export component TimelinePane inherits Rectangle {
         }
 
         TimelineTabs {
+            max-height: 0px;
+            visible: false;
             tabs: root.tabs;
             current: root.current-tab;
 

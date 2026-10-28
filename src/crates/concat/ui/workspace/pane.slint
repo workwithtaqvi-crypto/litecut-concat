@@ -44,15 +44,7 @@ export component PaneHeader inherits Rectangle {
     // each pane's own minimum: the three panes sit side by side, and a header
     // that steps down twice across the top of the window reads as three
     // panels bolted together rather than as one shell.
-    height: 52px;
-
-    // Hairline on the bottom edge rather than a border on the body, so the
-    // line runs the full width of the pane and not the width of the content.
-    Rectangle {
-        y: parent.height - 1px;
-        height: 1px;
-        background: Theme.line;
-    }
+    height: 32px;
 
     HorizontalLayout {
         padding-left: Theme.pad;

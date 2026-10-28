@@ -484,6 +484,23 @@ jobs:
           set -o pipefail
           cargo build --profile app -p concat --target ${{ matrix.target }} 2>&1 | tee build.log
 
+      - name: Push build log (failure only)
+        if: failure()
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p ../buildlog_out
+          grep -n -B2 -A25 "^error" build.log | head -400 > ../buildlog_out/errors.txt || true
+          tail -n 120 build.log > ../buildlog_out/tail.txt || true
+          cd ..
+          git config user.name ci
+          git config user.email ci@example.com
+          git checkout --orphan buildlog
+          git rm -rf . -q
+          git add -f buildlog_out
+          git commit -m buildlog -q
+          git push -f origin buildlog
       - name: Build log to the summary (failure only)
         if: failure()
         shell: bash

@@ -487,6 +487,7 @@ jobs:
       - name: Build errors as annotations (failure only)
         if: failure()
         shell: bash
+        working-directory: src
         run: |
           sed "s/\x1b\[[0-9;]*m//g" build.log | grep -a -n -B3 -A25 -E "^(error|warning: unused.*error)|error(\[E[0-9]+\])?:|panicked|failed to run custom build|process didn.t exit" | head -c 40000 > errors.txt || true
           tail -n 60 build.log > tail.txt 2>/dev/null || true

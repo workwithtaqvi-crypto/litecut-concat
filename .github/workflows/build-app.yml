@@ -492,10 +492,10 @@ jobs:
         shell: bash
         working-directory: src
         run: |
-          sed "s/\x1b\[[0-9;]*m//g" build.log | grep -a -n -B3 -A25 -E "^(error|warning: unused.*error)|error(\[E[0-9]+\])?:|panicked|failed to run custom build|process didn.t exit" | head -c 40000 > errors.txt || true
+          sed "s/\x1b\[[0-9;]*m//g" build.log | grep -a -n -B3 -A25 -E "^(error|warning: unused.*error)|error(\[E[0-9]+\])?:|panicked|failed to run custom build|process didn.t exit" | head -c 3500 > errors.txt || true
           sed "s/\x1b\[[0-9;]*m//g" build.log | grep -a -E "LNK[0-9]+|unresolved external" | cut -c1-220 | sort -u | head -n 25 > lnk.txt || true
           tail -n 60 build.log > tail.txt 2>/dev/null || true
-          for f in lnk.txt; do
+          for f in errors.txt lnk.txt; do
             [ -s "$f" ] || continue
             msg=$(sed 's/%/%25/g' "$f" | tr -d '\r' | sed ':a;N;$!ba;s/\n/%0A/g')
             echo "::error title=$f::$msg"

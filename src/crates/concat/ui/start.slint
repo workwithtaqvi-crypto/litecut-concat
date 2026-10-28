@@ -575,7 +575,7 @@ component PillButton inherits Rectangle {
     property <bool> lit: touch.has-hover && root.enabled;
     property <length> mark: root.glyph == Glyph.none ? 0px : 15px;
     property <length> gap: root.glyph == Glyph.none ? 0px : 8px;
-    property <brush> ink: root.primary ? Theme.launch-page
+    property <brush> ink: root.primary ? #ffffff
         : root.lit ? Theme.fg
         : Theme.fg-muted;
 
@@ -583,8 +583,8 @@ component PillButton inherits Rectangle {
     horizontal-stretch: root.block ? 1 : 0;
     min-width: root.block ? 0px
         : caption.preferred-width + root.mark + root.gap + 44px;
-    border-radius: self.height / 2;
-    background: root.primary ? (root.lit ? Theme.fg-hot : Theme.fg)
+    border-radius: 6px;
+    background: root.primary ? (root.lit ? Theme.accent-hover : Theme.accent)
         : root.lit ? Theme.launch-field
         : Theme.launch-raised;
     border-width: root.primary ? 0px : 1px;

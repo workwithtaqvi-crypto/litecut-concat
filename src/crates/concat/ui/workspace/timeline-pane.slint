@@ -5,7 +5,7 @@ import { Theme } from "../theme/theme.slint";
 import { Pane } from "pane.slint";
 import { PaneKind, PaneSwitcher } from "pane-switcher.slint";
 import { I18n } from "../i18n.slint";
-import { Glyph } from "../icons.slint";
+import { Glyph, Icon } from "../icons.slint";
 import { ContextMenu, MenuItemData, MenuMetrics, MenuRow } from "../primitives/context-menu.slint";
 import { HairlineSplitter } from "splitter.slint";
 import { ThinHScrollbar, ThinScrollbar } from "../primitives/scrollbar.slint";
@@ -520,6 +520,35 @@ export component TimelinePane inherits Rectangle {
                 width: root.meters-w;
                 height: parent.height;
                 ruler-height: root.ruler-height;
+            }
+
+            if root.clips.length == 0: Rectangle {
+                x: root.headers-w + 14px;
+                y: root.ruler-height + 70px;
+                width: parent.width - root.headers-w - root.meters-w - 28px;
+                height: 52px;
+                border-radius: 6px;
+                background: #ffffff0a;
+                border-width: 1px;
+                border-color: #ffffff12;
+
+                HorizontalLayout {
+                    padding-left: 18px;
+                    spacing: 10px;
+                    alignment: start;
+                    VerticalLayout {
+                        alignment: center;
+                        Icon { glyph: Glyph.film; size: 14px; tint: Theme.fg-muted; }
+                    }
+                    VerticalLayout {
+                        alignment: center;
+                        Text {
+                            text: "Drag material here and start to create";
+                            color: Theme.fg-muted;
+                            font-size: 12px;
+                        }
+                    }
+                }
             }
         }
     }

@@ -253,6 +253,37 @@ export component TitleBar inherits Rectangle {
             }
         }
 
+        if !root.minimal: Rectangle { width: 12px; }
+        if !root.minimal: VerticalLayout {
+            alignment: center;
+            HorizontalLayout {
+                spacing: 6px;
+                VerticalLayout {
+                    alignment: center;
+                    Rectangle {
+                        width: 12px;
+                        height: 12px;
+                        border-radius: 6px;
+                        background: Theme.green;
+                        Icon {
+                            x: (parent.width - self.width) / 2;
+                            y: (parent.height - self.height) / 2;
+                            glyph: Glyph.check;
+                            size: 8px;
+                            weight: 3;
+                            tint: #000000;
+                        }
+                    }
+                }
+                Text {
+                    text: "Auto saved";
+                    color: Theme.fg-dim;
+                    font-size: Theme.fs;
+                    vertical-alignment: center;
+                }
+            }
+        }
+
         Rectangle { horizontal-stretch: 1; }
 
         // Beside Settings, because it is the same sort of thing: neither one
@@ -274,6 +305,28 @@ export component TitleBar inherits Rectangle {
         // application — so the launch screen has no reason to be shut out of
         // it, and every reason not to be: it is now the only way through to
         // the theme.
+        if !root.minimal: VerticalLayout {
+            alignment: center;
+            Rectangle {
+                width: 92px;
+                height: 24px;
+                border-radius: 4px;
+                background: sc-touch.has-hover ? Theme.field-hover : Theme.field;
+                Text {
+                    text: "Shortcuts";
+                    color: Theme.fg;
+                    font-size: Theme.fs;
+                    horizontal-alignment: center;
+                    vertical-alignment: center;
+                }
+                sc-touch := TouchArea {
+                    mouse-cursor: pointer;
+                    clicked => { root.open-settings(); }
+                }
+            }
+        }
+        if !root.minimal: Rectangle { width: 6px; }
+
         VerticalLayout {
             alignment: center;
             HeaderIconButton {

@@ -1216,14 +1216,6 @@ export component PreviewPane inherits Rectangle {
             height: 46px;
             background: Theme.panel;
 
-            Rectangle {
-                x: 0;
-                y: 0;
-                width: parent.width;
-                height: 1px;
-                background: Theme.line;
-            }
-
             HorizontalLayout {
                 padding-left: 10px;
                 padding-right: 10px;
@@ -1235,26 +1227,11 @@ export component PreviewPane inherits Rectangle {
                     spacing: 8px;
                     alignment: start;
 
-                    VerticalLayout {
-                        alignment: center;
-                        NumberField {
-                            width: 116px;
-                            value <=> root.shown-frames;
-                            minimum: 0;
-                            maximum: root.playhead-free ? 1000000000 : root.total-frames;
-                            step: 1;
-                            // Scrubbing a timecode should walk frames at the
-                            // speed a hand expects, not fly a hundred at once.
-                            px-per-step: 3px;
-                            format(v) => {
-                                return Fmt.frames-timecode(v / root.frame-rate,
-                                    root.frame-rate);
-                            }
-                            parse(text) => {
-                                return Fmt.parse-frames(text, root.frame-rate);
-                            }
-                            changed(v) => { root.seek(v / root.frame-rate); }
-                        }
+                    Text {
+                        text: Fmt.frames-timecode(root.shown-frames / root.frame-rate, root.frame-rate);
+                        color: Theme.fg;
+                        font-size: 12px;
+                        vertical-alignment: center;
                     }
 
                     Text {
@@ -1272,18 +1249,6 @@ export component PreviewPane inherits Rectangle {
                     spacing: 2px;
                     alignment: center;
 
-                    IconButton {
-                        glyph: Glyph.skip-back;
-                        label: I18n.t("common.goToStart");
-                        enabled: !root.at-start;
-                        clicked => { root.seek(0); }
-                    }
-                    IconButton {
-                        glyph: Glyph.step-back;
-                        label: I18n.t("previewPane.previousFrame");
-                        enabled: !root.at-start;
-                        clicked => { root.step(-1); }
-                    }
 
                     // The one control you reach for without looking, so it is
                     // the one control that carries a colour.
@@ -1291,22 +1256,9 @@ export component PreviewPane inherits Rectangle {
                         glyph: root.playing ? Glyph.pause : Glyph.play;
                         label: root.playing ? I18n.t("previewPane.pause") : I18n.t("previewPane.play");
                         icon-size: 16px;
-                        accent: true;
                         clicked => { root.play-toggled(); }
                     }
 
-                    IconButton {
-                        glyph: Glyph.step-forward;
-                        label: I18n.t("previewPane.nextFrame");
-                        enabled: !root.at-end;
-                        clicked => { root.step(1); }
-                    }
-                    IconButton {
-                        glyph: Glyph.skip-forward;
-                        label: I18n.t("common.goToEnd");
-                        enabled: !root.at-end;
-                        clicked => { root.seek(root.duration); }
-                    }
                 }
 
                 // Trailing: what the output is and how close we are looking.

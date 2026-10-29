@@ -260,7 +260,7 @@ export component TitleBar inherits Rectangle {
         // it through. A seat's own corner button changes or closes that seat;
         // this is the only place a seat can be brought into existence, which
         // is why it lives on the window and not in a pane.
-        if !root.minimal: VerticalLayout {
+        if false: VerticalLayout {
             alignment: center;
             AddPaneButton {
                 added(kind) => { root.add-pane(kind); }
@@ -364,7 +364,7 @@ export component TitleBar inherits Rectangle {
         VerticalLayout {
             alignment: center;
             Text {
-                text: root.status;
+                text: "";
                 color: Theme.fg-dim;
                 font-size: Theme.fs-xs;
             }

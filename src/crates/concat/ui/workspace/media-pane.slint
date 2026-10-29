@@ -138,7 +138,7 @@ component LibraryTab inherits Rectangle {
         Text {
             text: root.label;
             color: root.tint;
-            font-size: 10px;
+            font-size: 11px;
             horizontal-alignment: center;
             vertical-alignment: center;
             overflow: elide;
@@ -2036,7 +2036,7 @@ export component MediaPane inherits Rectangle {
                 // thing.
                 VerticalLayout {
                     alignment: center;
-                    PaneSwitcher {
+                    if false: PaneSwitcher {
                         kind: PaneKind.media;
                         seat: root.pane-seat;
                         removable: root.pane-removable;

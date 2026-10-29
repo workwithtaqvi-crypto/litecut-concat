@@ -451,7 +451,7 @@ export component ConfigPane inherits Rectangle {
 
                 VerticalLayout {
                     alignment: center;
-                    PaneSwitcher {
+                    if false: PaneSwitcher {
                         kind: PaneKind.inspector;
                         seat: root.pane-seat;
                         removable: root.pane-removable;
@@ -477,6 +477,7 @@ export component ConfigPane inherits Rectangle {
                     FactRow { label: "Path:"; value: root.project-folder; }
                     FactRow { label: "Aspect ratio:"; value: "Original"; }
                     FactRow { label: "Resolution:"; value: root.project-output; }
+                    FactRow { label: "Color space:"; value: "Rec. 709 SDR"; }
                     FactRow { label: "Frame rate:"; value: root.project-rate; }
                     FactRow { label: "Duration:"; value: root.project-duration; }
                     FactRow { label: "Imported media:"; value: "Stay in original location"; }

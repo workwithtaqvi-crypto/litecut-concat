@@ -265,13 +265,13 @@ pub fn lay_out(node: &Dock, (x, y, w, h): (f32, f32, f32, f32), out: &mut DockLa
 pub fn default_dock() -> Dock {
     Dock::Split {
         columns: true,
-        ratio: 0.78,
+        ratio: 0.815,
         first: Box::new(Dock::Split {
             columns: false,
-            ratio: 0.6,
+            ratio: 0.55,
             first: Box::new(Dock::Split {
                 columns: true,
-                ratio: 0.32,
+                ratio: 0.405,
                 first: Dock::leaf(PaneKind::Media),
                 second: Dock::leaf(PaneKind::Preview),
             }),

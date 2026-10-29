@@ -206,7 +206,7 @@ export component TitleBar inherits Rectangle {
         // Each label reports its own position rather than a fixed one: they
         // are sized from their text, so where "View" starts depends on how
         // long "File" and "Edit" are.
-        if !root.macos: Text {
+        if !root.macos && !root.minimal: Text {
             text: "LiteCut";
             color: Theme.accent;
             font-size: 14px;

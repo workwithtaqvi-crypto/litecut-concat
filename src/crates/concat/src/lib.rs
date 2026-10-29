@@ -696,7 +696,9 @@ fn start(project: Option<std::path::PathBuf>, smoke: bool) -> Result<(), slint::
 
     // ── the launch screen ──
     app.on_start_compose(on_window!(|state| {
+        // Like CapCut: Create project goes straight into the editor.
         state.handle(Msg::Start(StartMsg::Compose));
+        state.handle(Msg::Start(StartMsg::Create));
     }));
     app.on_start_dismiss(on_window!(|state| {
         state.handle(Msg::Start(StartMsg::Dismiss));

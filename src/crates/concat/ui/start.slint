@@ -1677,10 +1677,6 @@ component WideHome inherits Rectangle {
 
                 Rectangle { vertical-stretch: 1; }
 
-                VersionLine {
-                    version: root.version;
-                    notes => { root.link("release-notes"); }
-                }
             }
         }
 
@@ -1735,8 +1731,8 @@ component WideHome inherits Rectangle {
                 HorizontalLayout {
                     alignment: start;
                     Pressable {
-                        width: 340px;
-                        height: 68px;
+                        width: 300px;
+                        height: 64px;
                         radius: 12px;
                         label: "Open project";
                         background: self.lit ? Theme.launch-raised : Theme.launch-panel;
@@ -1786,8 +1782,36 @@ component WideHome inherits Rectangle {
                     }
                 }
 
-                if root.recents-total == 0: EmptyProjects {
-                    first-edit => { root.link("first-edit"); }
+                if root.recents-total == 0: VerticalLayout {
+                    padding-top: 90px;
+                    spacing: 18px;
+                    alignment: start;
+                    HorizontalLayout {
+                        alignment: center;
+                        Rectangle {
+                            width: 96px;
+                            height: 82px;
+                            Rectangle {
+                                x: 0; y: 14px; width: 96px; height: 46px;
+                                border-radius: 6px; border-width: 2px; border-color: Theme.fg-dim;
+                            }
+                            Rectangle {
+                                x: 46px; y: 0; width: 2px; height: 82px; background: Theme.fg-dim;
+                            }
+                            Rectangle {
+                                x: 40px; y: 0; width: 14px; height: 14px;
+                                border-radius: 3px; border-width: 2px; border-color: Theme.fg-dim;
+                                background: Theme.launch-page;
+                            }
+                        }
+                    }
+                    Text {
+                        text: "Project edited will be saved automatically. Start creating your own videos!";
+                        color: Theme.fg-muted;
+                        font-size: 15px;
+                        horizontal-alignment: center;
+                        wrap: word-wrap;
+                    }
                 }
 
                 if root.recents-total > 0 && root.recents.length == 0: Text {

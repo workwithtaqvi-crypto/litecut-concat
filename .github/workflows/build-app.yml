@@ -1009,6 +1009,14 @@ jobs:
           [System.Windows.Forms.SendKeys]::SendWait("{ENTER}")
           Start-Sleep 15
           Shot "shots\03_editor.png"
+          [M]::Click(840, 16)
+          Start-Sleep 4
+          Shot "shots\04_export.png"
+          [System.Windows.Forms.SendKeys]::SendWait("{ESC}")
+          Start-Sleep 2
+          [M]::Click(785, 16)
+          Start-Sleep 4
+          Shot "shots\05_settings.png"
           Stop-Process $p -Force -ErrorAction SilentlyContinue
           git config --global user.email ci@example.com
           git config --global user.name ci
@@ -1119,7 +1127,8 @@ jobs:
           if ($LASTEXITCODE -ne 0) { throw "WiX failed with $LASTEXITCODE" }
           if (-not (Test-Path "stage\$name.msi")) { throw "stage\$name.msi is not there" }
           Sign "stage\$name.msi"
-          Compress-Archive -Path "stage\$name\*" -DestinationPath "stage\$name-portable.zip" -Force
+          Rename-Item "stage\$name\concat.exe" "LiteCut.exe"
+          Compress-Archive -Path "stage\$name\*" -DestinationPath "stage\LiteCut-portable.zip" -Force
           Remove-Item -Recurse -Force "stage\$name"
 
       # The signing certificate out of the user's store again, whether the
@@ -1142,5 +1151,5 @@ jobs:
         run: |
           $ErrorActionPreference = "Continue"
           gh release delete concat-latest --yes --cleanup-tag 2>$null
-          $files = Get-ChildItem stage -File | ForEach-Object { $_.FullName }
-          gh release create concat-latest @files --title "LiteCut (Concat base) latest" --notes "Windows installer + portable zip. Commit ${{ github.sha }}"
+          $files = @((Resolve-Path "stage\LiteCut-portable.zip").Path)
+          gh release create concat-latest @files --title "LiteCut latest" --notes "Windows installer + portable zip. Commit ${{ github.sha }}"

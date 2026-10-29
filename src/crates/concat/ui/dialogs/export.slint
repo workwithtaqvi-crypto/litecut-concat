@@ -635,225 +635,302 @@ export component ExportDialog inherits Rectangle {
         y: root.height * root.lowered;
         width: root.width;
         height: root.height;
-        background: Theme.panel;
+        background: #000000b8;
 
-        // Nothing under the sheet takes a press while it is up.
         TouchArea { }
 
-        VerticalLayout {
-            padding-top: root.inset-top;
-            padding-bottom: root.inset-bottom;
-            padding-left: root.inset-left;
-            padding-right: root.inset-right;
+        dlg := Rectangle {
+            width: Math.min(root.width - 24px, 760px);
+            height: Math.min(root.height - 24px, body.preferred-height);
+            x: (parent.width - self.width) / 2;
+            y: (parent.height - self.height) / 2;
+            background: #1e1e1e;
+            border-radius: 8px;
+            border-width: 1px;
+            border-color: #ffffff14;
+            clip: true;
 
-            // ── the header ───────────────────────────────────────────────
-            Rectangle {
-                height: 52px;
-
+            body := VerticalLayout {
+                // title row
                 Rectangle {
-                    x: 0;
-                    y: parent.height - 1px;
-                    width: parent.width;
-                    height: 1px;
-                    background: Theme.line;
-                }
-
-                // The close on the trailing edge and the title centred
-                // against the whole strip. Nothing on the leading edge:
-                // that corner is the window's traffic lights on a Mac, and
-                // the format is in the Summary anyway.
-                HorizontalLayout {
-                    padding-left: Theme.pad;
-                    padding-right: 12px;
-                    spacing: 8px;
-
-                    Rectangle { horizontal-stretch: 1; }
-
-                    // Gone, not disabled, while a job is running: there is
-                    // no safe answer to pressing it, so it should not be
-                    // there to press. It points down, the way the sheet
-                    // leaves.
-                    if !root.running: VerticalLayout {
-                        alignment: center;
-                        Rectangle {
-                            width: 32px;
-                            height: 32px;
-                            border-radius: Theme.r-sm;
-                            background: shut.has-hover ? Theme.field : Colors.transparent;
-
-                            Icon {
-                                x: (parent.width - self.width) / 2;
-                                y: (parent.height - self.height) / 2;
-                                glyph: Glyph.close;
-                                size: 14px;
-                                tint: shut.has-hover ? Theme.fg : Theme.fg-muted;
-                            }
-
-                            shut := TouchArea {
-                                mouse-cursor: pointer;
-                                clicked => { root.closed(); }
-                            }
-                        }
-                    }
-                }
-
-                HorizontalLayout {
-                    x: (parent.width - self.preferred-width) / 2;
-                    y: 0;
-                    width: self.preferred-width;
-                    height: parent.height;
-                    spacing: 8px;
-
-                    VerticalLayout {
-                        alignment: center;
-                        Icon { glyph: Glyph.export; size: 16px; tint: Theme.accent; }
-                    }
-
+                    height: 44px;
                     Text {
-                        text: I18n.t("common.export");
+                        x: 18px;
+                        text: "Export";
                         color: Theme.fg;
-                        font-size: Theme.fs-lg;
-                        font-weight: Theme.weight-title;
+                        font-size: 16px;
+                        font-weight: 700;
                         vertical-alignment: center;
                     }
-                }
-            }
-
-            // ── the groups ───────────────────────────────────────────────
-            PaneScroll {
-                vertical-stretch: 1;
-                finger: root.phone;
-
-                Measure {
-                    padding-top: 8px;
-                    padding-bottom: 16px;
-
-                    if root.running || root.columns == 1: VerticalLayout {
-                        SummarySection { first: true; data: root.data; }
-                        if !root.running: DestinationSection {
-                            data: root.data;
-                            phone: root.phone;
-                            name-edited(name) => { root.name-edited(name); }
-                            browse => { root.browse(); }
+                    if !root.running: Rectangle {
+                        x: parent.width - 40px;
+                        y: 8px;
+                        width: 28px;
+                        height: 28px;
+                        border-radius: 4px;
+                        background: shut.has-hover ? #ffffff14 : transparent;
+                        Icon {
+                            x: (parent.width - self.width) / 2;
+                            y: (parent.height - self.height) / 2;
+                            glyph: Glyph.close;
+                            size: 13px;
+                            tint: Theme.fg-muted;
                         }
-                        if !root.running: OutputSection {
-                            data: root.data;
-                            bitrate-changed(mbps) => { root.bitrate-changed(mbps); }
-                            rate-changed(index) => { root.rate-changed(index); }
-                            codec-changed(index) => { root.codec-changed(index); }
-                            ten-bit-changed(on) => { root.ten-bit-changed(on); }
-                            hdr-changed(on) => { root.hdr-changed(on); }
-                        }
-                    }
-
-                    // Two columns: the picture, what it is and where it
-                    // goes on the left; how it is written on the right.
-                    if !root.running && root.columns == 2: HorizontalLayout {
-                        spacing: 12px;
-
-                        VerticalLayout {
-                            alignment: start;
-                            horizontal-stretch: 1;
-                            PreviewSection {
-                                first: true;
-                                frame: root.preview-frame;
-                                playhead: root.playhead;
-                                duration: root.duration-seconds;
-                                frame-rate: root.frame-rate;
-                                see-through: root.data.see-through;
-                                seek(seconds) => { root.seek(seconds); }
-                            }
-                            SummarySection { data: root.data; }
-                        }
-
-                        VerticalLayout {
-                            alignment: start;
-                            horizontal-stretch: 1;
-                            DestinationSection {
-                                first: true;
-                                data: root.data;
-                                phone: root.phone;
-                                name-edited(name) => { root.name-edited(name); }
-                                browse => { root.browse(); }
-                            }
-                            OutputSection {
-                                data: root.data;
-                                bitrate-changed(mbps) => { root.bitrate-changed(mbps); }
-                                rate-changed(index) => { root.rate-changed(index); }
-                                codec-changed(index) => { root.codec-changed(index); }
-                                ten-bit-changed(on) => { root.ten-bit-changed(on); }
-                                hdr-changed(on) => { root.hdr-changed(on); }
-                            }
-                        }
-                    }
-
-                    // Three columns: the picture and what it is; how it is
-                    // written; where it goes.
-                    if !root.running && root.columns == 3: HorizontalLayout {
-                        spacing: 12px;
-
-                        VerticalLayout {
-                            alignment: start;
-                            horizontal-stretch: 1;
-                            PreviewSection {
-                                first: true;
-                                frame: root.preview-frame;
-                                playhead: root.playhead;
-                                duration: root.duration-seconds;
-                                frame-rate: root.frame-rate;
-                                see-through: root.data.see-through;
-                                seek(seconds) => { root.seek(seconds); }
-                            }
-                            SummarySection { data: root.data; }
-                        }
-
-                        VerticalLayout {
-                            alignment: start;
-                            horizontal-stretch: 1;
-                            OutputSection {
-                                first: true;
-                                data: root.data;
-                                bitrate-changed(mbps) => { root.bitrate-changed(mbps); }
-                                rate-changed(index) => { root.rate-changed(index); }
-                                codec-changed(index) => { root.codec-changed(index); }
-                                ten-bit-changed(on) => { root.ten-bit-changed(on); }
-                                hdr-changed(on) => { root.hdr-changed(on); }
-                            }
-                        }
-
-                        VerticalLayout {
-                            alignment: start;
-                            horizontal-stretch: 1;
-                            DestinationSection {
-                                first: true;
-                                data: root.data;
-                                phone: root.phone;
-                                name-edited(name) => { root.name-edited(name); }
-                                browse => { root.browse(); }
-                            }
+                        shut := TouchArea {
+                            mouse-cursor: pointer;
+                            clicked => { root.closed(); }
                         }
                     }
                 }
-            }
+                Rectangle { height: 1px; background: #ffffff10; }
 
-            // ── the footer ───────────────────────────────────────────────
-            Rectangle {
-                height: 1px;
-                background: Theme.line;
-            }
+                if root.data.phase == ExportPhase.idle: HorizontalLayout {
+                    padding: 18px;
+                    spacing: 22px;
 
-            // The groups pad themselves; the footer is padded to match.
-            Measure {
-                padding: 14px;
+                    // cover
+                    VerticalLayout {
+                        width: 270px;
+                        alignment: start;
+                        Rectangle {
+                            height: 152px;
+                            border-radius: 6px;
+                            background: #000000;
+                            clip: true;
+                            if root.preview-frame.width > 0: Image {
+                                width: parent.width;
+                                height: parent.height;
+                                source: root.preview-frame;
+                                image-fit: contain;
+                            }
+                            Rectangle {
+                                x: 8px;
+                                y: 8px;
+                                width: cover-label.preferred-width + 16px;
+                                height: 24px;
+                                border-radius: 4px;
+                                background: #00000099;
+                                cover-label := Text {
+                                    text: "Edit cover";
+                                    color: #ffffff;
+                                    font-size: 12px;
+                                    horizontal-alignment: center;
+                                    vertical-alignment: center;
+                                }
+                            }
+                        }
+                    }
 
-                ExportFooter {
-                    data: root.data;
-                    narrow: root.columns == 1;
-                    phone: root.phone;
-                    begin => { root.begin(); }
-                    cancel => { root.cancel(); }
-                    reveal => { root.reveal(); }
-                    again => { root.again(); }
+                    // settings
+                    VerticalLayout {
+                        horizontal-stretch: 1;
+                        spacing: 12px;
+
+                        HorizontalLayout {
+                            spacing: 12px;
+                            Text { width: 84px; text: "Name"; color: Theme.fg; font-size: 13px; vertical-alignment: center; }
+                            Field {
+                                value: root.data.name;
+                                edited(text) => { root.name-edited(text); }
+                            }
+                        }
+
+                        HorizontalLayout {
+                            spacing: 8px;
+                            Text { width: 84px; text: "Export to"; color: Theme.fg; font-size: 13px; vertical-alignment: center; }
+                            Rectangle {
+                                horizontal-stretch: 1;
+                                height: 30px;
+                                border-radius: 4px;
+                                background: Theme.field;
+                                Text {
+                                    x: 10px;
+                                    width: parent.width - 20px;
+                                    text: root.data.path;
+                                    color: Theme.fg;
+                                    font-size: 12px;
+                                    overflow: elide;
+                                    vertical-alignment: center;
+                                }
+                            }
+                            Button {
+                                square: true;
+                                glyph: Glyph.folder;
+                                clicked => { root.browse(); }
+                            }
+                        }
+
+                        Rectangle { height: 1px; background: #ffffff10; }
+
+                        HorizontalLayout {
+                            spacing: 8px;
+                            Rectangle {
+                                width: 16px;
+                                height: 16px;
+                                border-radius: 4px;
+                                background: Theme.accent;
+                                Icon {
+                                    x: (parent.width - self.width) / 2;
+                                    y: (parent.height - self.height) / 2;
+                                    glyph: Glyph.check;
+                                    size: 11px;
+                                    weight: 3;
+                                    tint: #ffffff;
+                                }
+                            }
+                            Text { text: "Video"; color: Theme.fg; font-size: 14px; font-weight: 700; vertical-alignment: center; }
+                        }
+
+                        HorizontalLayout {
+                            spacing: 12px;
+                            Text { width: 84px; text: "Resolution"; color: Theme.fg-muted; font-size: 13px; vertical-alignment: center; }
+                            Rectangle {
+                                horizontal-stretch: 1;
+                                height: 30px;
+                                border-radius: 4px;
+                                background: Theme.field;
+                                Text {
+                                    text: root.data.resolutions[root.data.resolution];
+                                    color: Theme.fg;
+                                    font-size: 13px;
+                                    font-weight: 600;
+                                    horizontal-alignment: center;
+                                    vertical-alignment: center;
+                                }
+                            }
+                        }
+
+                        if root.data.rate-controlled: HorizontalLayout {
+                            spacing: 12px;
+                            Text { width: 84px; text: "Bit rate"; color: Theme.fg-muted; font-size: 13px; vertical-alignment: center; }
+                            NumberField {
+                                value: root.data.target;
+                                minimum: 0.5;
+                                maximum: 400;
+                                step: 0.5;
+                                precision: 1;
+                                px-per-step: 4px;
+                                unit: "Mbps";
+                                changed(value) => { root.bitrate-changed(value); }
+                            }
+                        }
+
+                        HorizontalLayout {
+                            spacing: 12px;
+                            Text { width: 84px; text: "Codec"; color: Theme.fg-muted; font-size: 13px; vertical-alignment: center; }
+                            Select {
+                                current: root.data.hdr ? root.data.codec - 1 : root.data.codec;
+                                options: root.data.hdr ? ["HEVC", "AV1"] : ["H.264", "HEVC", "AV1", "ProRes 4444", "VP9 alpha"];
+                                changed(index) => { root.codec-changed(root.data.hdr ? index + 1 : index); }
+                            }
+                        }
+
+                        HorizontalLayout {
+                            spacing: 12px;
+                            Text { width: 84px; text: "Format"; color: Theme.fg-muted; font-size: 13px; vertical-alignment: center; }
+                            Rectangle {
+                                horizontal-stretch: 1;
+                                height: 30px;
+                                border-radius: 4px;
+                                background: Theme.field;
+                                Text {
+                                    text: root.data.format;
+                                    color: Theme.fg;
+                                    font-size: 13px;
+                                    font-weight: 600;
+                                    horizontal-alignment: center;
+                                    vertical-alignment: center;
+                                }
+                            }
+                        }
+
+                        HorizontalLayout {
+                            spacing: 12px;
+                            Text { width: 84px; text: "Frame rate"; color: Theme.fg-muted; font-size: 13px; vertical-alignment: center; }
+                            Select {
+                                current: root.data.rate;
+                                options: root.data.rates;
+                                changed(index) => { root.rate-changed(index); }
+                            }
+                        }
+
+                        Text {
+                            text: "Color space: Rec. 709 SDR";
+                            color: Theme.fg-dim;
+                            font-size: 12px;
+                        }
+                    }
+                }
+
+                if root.data.phase != ExportPhase.idle: VerticalLayout {
+                    padding: 18px;
+                    spacing: 12px;
+                    ExportFooter {
+                        data: root.data;
+                        narrow: false;
+                        phone: root.phone;
+                        begin => { root.begin(); }
+                        cancel => { root.cancel(); }
+                        reveal => { root.reveal(); }
+                        again => { root.again(); }
+                    }
+                }
+
+                if root.data.phase == ExportPhase.idle: Rectangle { height: 1px; background: #ffffff10; }
+
+                if root.data.phase == ExportPhase.idle: HorizontalLayout {
+                    padding: 14px;
+                    padding-left: 18px;
+                    spacing: 10px;
+
+                    Text {
+                        horizontal-stretch: 1;
+                        text: "Duration: " + root.data.duration + "  |  Size: " + root.data.size-chosen;
+                        color: Theme.fg-muted;
+                        font-size: 13px;
+                        vertical-alignment: center;
+                        overflow: elide;
+                    }
+
+                    Rectangle {
+                        width: 96px;
+                        height: 32px;
+                        border-radius: 4px;
+                        opacity: (root.data.empty || root.data.name == "") ? 0.45 : 1.0;
+                        background: go.has-hover ? Theme.accent-hover : Theme.accent;
+                        Text {
+                            text: "Export";
+                            color: #ffffff;
+                            font-size: 14px;
+                            font-weight: 700;
+                            horizontal-alignment: center;
+                            vertical-alignment: center;
+                        }
+                        go := TouchArea {
+                            enabled: !root.data.empty && root.data.name != "";
+                            mouse-cursor: pointer;
+                            clicked => { root.begin(); }
+                        }
+                    }
+
+                    Rectangle {
+                        width: 96px;
+                        height: 32px;
+                        border-radius: 4px;
+                        background: no.has-hover ? Theme.field-hover : Theme.field;
+                        Text {
+                            text: "Cancel";
+                            color: Theme.fg;
+                            font-size: 14px;
+                            font-weight: 600;
+                            horizontal-alignment: center;
+                            vertical-alignment: center;
+                        }
+                        no := TouchArea {
+                            mouse-cursor: pointer;
+                            clicked => { root.closed(); }
+                        }
+                    }
                 }
             }
         }

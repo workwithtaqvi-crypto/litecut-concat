@@ -1012,7 +1012,7 @@ jobs:
           [M]::Click(840, 16)
           Start-Sleep 4
           Shot "shots\04_export.png"
-          [System.Windows.Forms.SendKeys]::SendWait("{ESC}")
+          [M]::Click(829, 579)
           Start-Sleep 2
           [M]::Click(785, 16)
           Start-Sleep 4

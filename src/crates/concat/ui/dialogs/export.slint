@@ -834,7 +834,7 @@ export component ExportDialog inherits Rectangle {
                                 border-radius: 4px;
                                 background: Theme.field;
                                 Text {
-                                    text: root.data.format;
+                                    text: root.data.codec == 3 ? "mov" : root.data.codec == 4 ? "webm" : "mp4";
                                     color: Theme.fg;
                                     font-size: 13px;
                                     font-weight: 600;
